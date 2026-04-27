@@ -1,0 +1,19 @@
+Newton's Laws of Motion:
+
+First Law: A body remains at rest or in uniform motion unless acted upon by external force. Property called inertia resists change in state.
+
+Second Law: Net force = rate of change of momentum. F = ma = dp/dt. Momentum p = mv.
+
+Third Law: Every action has an equal and opposite reaction. Forces are in pairs on different bodies. Example: rocket propulsion, gun recoil.
+
+Conservation of momentum: In the absence of external force total linear momentum is conserved. Useful in collisions and explosions. m1u1 + m2u2 = m1v1 + m2v2.
+
+Impulse = F.t = change in momentum = m(v-u).
+
+Elastic collision: KE and momentum both conserved, e=1.
+Inelastic collision: only momentum conserved, e less than 1.
+Perfectly inelastic: bodies stick, maximum KE loss, e=0.
+
+Friction: Static friction (us.N) prevents relative motion. Kinetic friction (uk.N) opposes sliding. us always greater than uk. Independent of area.
+
+Circular Motion: Centripetal force = mv^2/r toward center. Centripetal acceleration = v^2/r. Banking of curved roads uses tan(theta) = v^2/rg.

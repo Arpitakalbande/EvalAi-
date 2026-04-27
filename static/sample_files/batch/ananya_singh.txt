@@ -1,0 +1,9 @@
+Newton's laws of motion form the foundation of classical mechanics. The first law defines inertia - a body at rest or in uniform motion remains so unless acted upon by external net force. Newton's second law gives F = ma, or more fundamentally F = dp/dt where p = mv is linear momentum. The third law states action and reaction forces are equal, opposite, and act on different bodies.
+
+The impulse-momentum theorem states J = Ft = change in momentum = m(v-u). Conservation of linear momentum holds when net external force is zero: m1u1 + m2u2 = m1v1 + m2v2.
+
+For collisions: elastic conserves both KE and momentum (e=1), inelastic conserves only momentum (e<1), perfectly inelastic has bodies sticking together with maximum energy loss (e=0).
+
+Friction: static fs <= us.N prevents motion; kinetic fk = uk.N opposes sliding. Always us > uk. Friction independent of contact area.
+
+Centripetal acceleration = v^2/r toward center. Centripetal force = mv^2/r. Banking of roads: tan(theta) = v^2/rg for frictionless curved road. Applications: rocket propulsion (third law), walking, gun recoil, banking.

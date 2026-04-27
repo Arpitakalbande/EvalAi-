@@ -1,0 +1,25 @@
+Newton's Laws of Motion
+
+Newton's first law says that a body stays at rest or continues moving in a straight line unless an external force acts on it. This is called the law of inertia. Inertia is the property of matter that resists changes in its state.
+
+Newton's second law: The net force on a body equals mass times acceleration. F = ma. This comes from the fact that force is equal to rate of change of momentum. So F = dp/dt. Linear momentum p = mv.
+
+Newton's third law: Every action has an equal and opposite reaction. The forces act on different bodies simultaneously. Example: a gun recoils backward when a bullet is fired forward because of this law.
+
+Conservation of Linear Momentum:
+When no external force acts on a system, total momentum remains constant. m1u1 + m2u2 = m1v1 + m2v2. This applies to rocket propulsion, collisions, and explosions.
+
+Impulse = Force x time = change in momentum. Impulse-momentum theorem is very useful in collisions.
+
+Collisions:
+- Elastic collision: Both kinetic energy and momentum conserved. Coefficient of restitution e = 1.
+- Inelastic collision: Only momentum conserved, kinetic energy lost partially. e < 1.
+- Perfectly inelastic: Maximum KE loss, bodies stick together after collision. e = 0.
+
+Friction:
+Static friction is fs <= us x N. It prevents relative motion. Kinetic friction fk = uk x N opposes sliding. Static friction coefficient is greater than kinetic. Friction is independent of area of contact and depends on normal reaction and nature of surfaces.
+
+Circular Motion:
+Centripetal acceleration = v^2/r directed toward center. Centripetal force = mv^2/r. This force is provided by tension in a string, friction, or gravity depending on the situation. Banking angle is tan theta = v^2/rg.
+
+Applications include rocket propulsion, walking, and banking of roads on curved paths.

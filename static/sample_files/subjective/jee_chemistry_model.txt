@@ -1,0 +1,48 @@
+CHEMICAL BONDING AND MOLECULAR STRUCTURE — JEE NOTES
+
+Ionic Bond (Electrovalent Bond):
+Formed by the complete transfer of one or more electrons from one atom to another. Occurs between elements with large differences in electronegativity (generally > 1.7). The atom losing electrons forms a cation (positive ion) and the atom gaining electrons forms an anion (negative ion). Ionic compounds have high melting and boiling points, are soluble in polar solvents, and conduct electricity in molten or dissolved state.
+
+Covalent Bond:
+Formed by the mutual sharing of electron pairs between atoms. Occurs between atoms with similar electronegativities. Types:
+- Single bond: One shared pair (sigma bond). Example: H2, CH4.
+- Double bond: One sigma + one pi bond. Example: O2, C2H4.
+- Triple bond: One sigma + two pi bonds. Example: N2, C2H2.
+Bond length decreases and bond energy increases from single to triple bond.
+
+Coordinate (Dative) Bond:
+A type of covalent bond where both electrons in the shared pair are provided by only one atom (donor). The atom receiving is the acceptor. Example: NH3-BF3 complex, H3O+ ion.
+
+Polarity of Bonds:
+Electronegativity difference between bonded atoms determines polarity. Greater the electronegativity difference, more polar the bond. Dipole moment = charge x bond length. Molecules with symmetric geometry have zero dipole moment even with polar bonds (e.g., CO2, BF3).
+
+VSEPR Theory (Valence Shell Electron Pair Repulsion):
+Electron pairs (bonding and non-bonding) repel each other and arrange themselves to minimize repulsion.
+Repulsion order: lone pair-lone pair > lone pair-bond pair > bond pair-bond pair.
+This determines molecular geometry:
+- 2 bonding pairs: linear (180 degrees)
+- 3 bond pairs: trigonal planar (120 degrees)
+- 4 bond pairs: tetrahedral (109.5 degrees)
+- 3 bond + 1 lone pair: pyramidal (107 degrees) e.g., NH3
+- 2 bond + 2 lone pairs: bent/angular (104.5 degrees) e.g., H2O
+
+Hybridization:
+Mixing of atomic orbitals to form new hybrid orbitals of equivalent energy and shape.
+- sp hybridization: 2 hybrid orbitals, linear geometry, bond angle 180 degrees. Example: BeCl2, C2H2.
+- sp2 hybridization: 3 hybrid orbitals, trigonal planar, 120 degrees. Example: BF3, C2H4.
+- sp3 hybridization: 4 hybrid orbitals, tetrahedral, 109.5 degrees. Example: CH4, NH3, H2O.
+
+Sigma and Pi Bonds:
+Sigma bond: Formed by head-on or axial overlap of orbitals. Stronger, allows rotation.
+Pi bond: Formed by lateral/sideways overlap of p orbitals. Weaker than sigma, restricts rotation.
+
+Hydrogen Bonding:
+Electrostatic attraction between hydrogen bonded to a highly electronegative atom (F, O, N) and the electronegative atom of another molecule.
+Intermolecular H-bonding: between different molecules. Increases boiling point. Example: H2O, HF, NH3.
+Intramolecular H-bonding: within the same molecule. Decreases boiling point. Example: o-nitrophenol.
+
+Molecular Orbital Theory (MOT):
+Atomic orbitals combine to form molecular orbitals. Bonding MO has lower energy; antibonding MO has higher energy. Bond order = (bonding electrons - antibonding electrons) / 2. Higher bond order = stronger, shorter bond.
+
+Van der Waals Forces:
+Weak intermolecular forces. London dispersion forces (temporary dipoles), dipole-dipole interactions. Increase with molecular size and surface area.

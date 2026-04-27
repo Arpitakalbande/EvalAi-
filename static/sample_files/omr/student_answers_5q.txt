@@ -1,0 +1,9 @@
+Q1. Newton's Second Law says force equals mass times acceleration. F = ma. It means the more force you apply on an object the more it accelerates. It also means heavier objects need more force for same acceleration. This law relates to momentum as F = dp/dt where p is momentum.
+
+Q2. Conservation of linear momentum means when no external force acts on a system the total momentum does not change. This is used in rocket propulsion. The rocket burns fuel and expels gases backward. The forward momentum of rocket equals the backward momentum of gases so total is conserved. Also used to analyze collisions between objects.
+
+Q3. Elastic collision conserves both kinetic energy and momentum. Coefficient of restitution is 1. Perfectly inelastic collision is when two bodies collide and stick together. Only momentum is conserved in this case. Kinetic energy is lost as heat and sound. The loss of kinetic energy is maximum in perfectly inelastic collision. Coefficient of restitution is zero.
+
+Q4. Static friction prevents objects from sliding. It is fs <= us times N. It can adjust to balance applied force up to its maximum value. Kinetic friction is fk = uk times N and it acts when surfaces are already sliding. Static friction is always greater than kinetic friction. Both depend on normal force and nature of surfaces.
+
+Q5. Centripetal force acts toward the center of circular motion. Formula is F = mv squared divided by r. This force is not a separate force but is provided by real forces like tension or friction or gravity. For banking of roads the angle satisfies tan theta equals v squared by rg for ideal conditions without friction. This helps vehicles safely take turns.

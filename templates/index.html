@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>EvalAI — Intelligent Exam Evaluator</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#070b14;--surf:#0d1526;--surf2:#131e32;--surf3:#1a2740;
+  --bord:#1e2d47;--bord2:#263650;
+  --txt:#e2eaf5;--sub:#4d6a8a;--mute:#2a3f5a;
+  --acc:#4f9cf9;--acc2:#a78bfa;
+  --grn:#22c55e;--orn:#f59e0b;--red:#ef4444;--pur:#c084fc;
+  --r:14px;
+}
+.light{
+  --bg:#f0f4f9;--surf:#fff;--surf2:#eef1f7;--surf3:#e4eaf3;
+  --bord:#d0d9e8;--bord2:#c0cfe2;--txt:#0f172a;--sub:#64748b;--mute:#e4eaf3;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--txt);font-family:'Outfit',sans-serif;min-height:100vh;transition:background .3s,color .3s;overflow-x:hidden}
+
+/* ── TOPBAR ─────────────────────────────────── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:62px;background:var(--surf);border-bottom:1px solid var(--bord);position:sticky;top:0;z-index:200}
+.logo{font-size:1.3rem;font-weight:900;letter-spacing:-.04em;background:linear-gradient(135deg,var(--acc),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;cursor:pointer}
+.topnav{display:flex;gap:4px}
+.tnb{padding:6px 15px;border-radius:99px;border:1px solid transparent;background:transparent;color:var(--sub);font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.tnb:hover{color:var(--acc);border-color:var(--bord2);background:var(--surf2)}
+.tnb.active{color:var(--acc);border-color:var(--acc);background:rgba(79,156,249,.1)}
+.top-r{display:flex;align-items:center;gap:10px}
+.tbtn{width:38px;height:38px;border-radius:50%;border:1px solid var(--bord);background:var(--surf2);color:var(--txt);font-size:.95rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.tbtn:hover{border-color:var(--acc)}
+
+/* ── PAGES ──────────────────────────────────── */
+.page{display:none;animation:fadein .4s ease}
+.page.active{display:block}
+
+/* ── LANDING ────────────────────────────────── */
+#page-home{
+  min-height:calc(100vh - 62px);
+  display:none;
+  flex-direction:column;
+}
+#page-home.active{display:flex}
+
+.hero-section{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:60px 40px 40px;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(79,156,249,.1) 0%,transparent 70%);
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:99px;
+  background:rgba(79,156,249,.12);border:1px solid rgba(79,156,249,.3);
+  color:var(--acc);font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  margin-bottom:24px;animation:fadein .5s ease;
+}
+.hero-title{
+  font-size:clamp(2.4rem,6vw,4.2rem);font-weight:900;letter-spacing:-.05em;line-height:1.05;
+  margin-bottom:20px;animation:fadein .5s .1s ease both;
+}
+.hero-title span{background:linear-gradient(135deg,var(--acc),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:1.05rem;color:var(--sub);max-width:560px;line-height:1.7;margin-bottom:40px;animation:fadein .5s .2s ease both}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;animation:fadein .5s .3s ease both}
+
+/* feature cards on landing */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:0 40px 60px;max-width:1100px;margin:0 auto;width:100%;animation:fadein .6s .2s ease both}
+@media(max-width:800px){.feat-grid{grid-template-columns:1fr}}
+.feat-card{background:var(--surf);border:1px solid var(--bord);border-radius:var(--r);padding:24px;transition:border-color .2s,transform .2s,box-shadow .2s;cursor:pointer}
+.feat-card:hover{border-color:var(--acc);transform:translateY(-3px);box-shadow:0 12px 40px rgba(79,156,249,.12)}
+.feat-icon{font-size:2rem;margin-bottom:14px}
+.feat-title{font-size:1.05rem;font-weight:800;margin-bottom:6px;letter-spacing:-.02em}
+.feat-desc{font-size:.84rem;color:var(--sub);line-height:1.6}
+.feat-tag{display:inline-flex;align-items:center;gap:4px;margin-top:12px;padding:3px 10px;border-radius:99px;font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.tag-blue{background:rgba(79,156,249,.12);color:var(--acc);border:1px solid rgba(79,156,249,.2)}
+.tag-pur{background:rgba(192,132,252,.12);color:var(--pur);border:1px solid rgba(192,132,252,.2)}
+.tag-grn{background:rgba(34,197,94,.12);color:var(--grn);border:1px solid rgba(34,197,94,.2)}
+
+/* stats strip */
+.stats{display:flex;justify-content:center;gap:48px;padding:32px 40px;border-top:1px solid var(--bord);border-bottom:1px solid var(--bord);margin-bottom:48px;flex-wrap:wrap}
+.stat-item{text-align:center}
+.stat-num{font-size:2rem;font-weight:900;letter-spacing:-.04em;background:linear-gradient(135deg,var(--acc),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-lbl{font-size:.75rem;color:var(--sub);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+
+/* ── APP AREA ────────────────────────────────── */
+.wrap{max-width:1200px;margin:0 auto;padding:36px 28px}
+.section-hero{margin-bottom:28px}
+.section-hero h2{font-size:1.8rem;font-weight:900;letter-spacing:-.03em;margin-bottom:6px;background:linear-gradient(135deg,var(--txt) 50%,var(--acc));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.section-hero p{color:var(--sub);font-size:.9rem}
+
+/* ── SAMPLE FILES INLINE PANEL ──────────────── */
+.sample-panel{
+  background:var(--surf);
+  border:1px solid var(--bord);
+  border-radius:var(--r);
+  margin-bottom:20px;
+  overflow:hidden;
+}
+.sample-panel-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 18px;
+  background:linear-gradient(90deg,rgba(79,156,249,.07),rgba(167,139,250,.05));
+  border-bottom:1px solid var(--bord);
+  cursor:pointer;
+  user-select:none;
+}
+.sample-panel-header:hover{background:linear-gradient(90deg,rgba(79,156,249,.12),rgba(167,139,250,.08))}
+.sample-panel-title{
+  display:flex;align-items:center;gap:8px;
+  font-size:.78rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);
+}
+.sample-panel-chevron{
+  font-size:.85rem;color:var(--sub);
+  transition:transform .25s;
+}
+.sample-panel.open .sample-panel-chevron{transform:rotate(180deg)}
+.sample-panel-body{
+  display:none;
+  padding:14px 18px 18px;
+}
+.sample-panel.open .sample-panel-body{display:block}
+.sample-desc{font-size:.78rem;color:var(--sub);margin-bottom:12px;line-height:1.5}
+.sample-files-grid{display:flex;flex-wrap:wrap;gap:8px}
+.sample-file-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 14px;
+  border-radius:8px;
+  border:1px solid var(--bord2);
+  background:var(--surf2);
+  color:var(--txt);
+  font-family:'Outfit',sans-serif;
+  font-size:.78rem;font-weight:600;
+  cursor:pointer;
+  transition:all .2s;
+}
+.sample-file-btn:hover{
+  border-color:var(--acc);color:var(--acc);
+  background:rgba(79,156,249,.07);
+  transform:translateY(-1px);
+}
+.sample-file-btn .sfb-icon{font-size:.9rem}
+.sample-file-btn .sfb-name{font-family:'JetBrains Mono',monospace;font-size:.72rem}
+.sample-load-all{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:10px;padding:8px 18px;
+  border-radius:8px;border:none;
+  background:linear-gradient(135deg,var(--acc),var(--acc2));
+  color:#fff;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;
+  cursor:pointer;transition:all .2s;
+}
+.sample-load-all:hover{opacity:.88;transform:translateY(-1px)}
+.sample-loaded-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:99px;
+  background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);
+  color:var(--grn);font-size:.7rem;font-weight:700;
+  margin-left:8px;vertical-align:middle;
+}
+
+/* ── CARDS ──────────────────────────────────── */
+.card{background:var(--surf);border:1px solid var(--bord);border-radius:var(--r);padding:20px 22px;transition:border-color .2s}
+.card-title{font-size:.67rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--sub);margin-bottom:10px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:760px){.g3,.g2,.g4{grid-template-columns:1fr}}
+
+/* ── METRICS ────────────────────────────────── */
+.mv{font-size:2.6rem;font-weight:900;letter-spacing:-.05em;line-height:1;margin:6px 0 10px}
+.mv small{font-size:1.1rem;font-weight:400;color:var(--sub)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:.68rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.b-g{background:rgba(34,197,94,.12);color:var(--grn);border:1px solid rgba(34,197,94,.25)}
+.b-o{background:rgba(245,158,11,.12);color:var(--orn);border:1px solid rgba(245,158,11,.25)}
+.b-r{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+.b-p{background:rgba(192,132,252,.12);color:var(--pur);border:1px solid rgba(192,132,252,.25)}
+
+/* ── UPLOAD ─────────────────────────────────── */
+.uzone{border:2px dashed var(--bord2);border-radius:12px;padding:22px 16px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--surf2)}
+.uzone:hover,.uzone.drag{border-color:var(--acc);background:rgba(79,156,249,.04)}
+.uzone.ok{border-color:var(--grn);border-style:solid;background:rgba(34,197,94,.03)}
+.uzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.uz-ic{font-size:1.6rem;margin-bottom:5px}
+.uz-txt{font-size:.79rem;color:var(--sub);font-weight:500}
+.uz-name{margin-top:7px;padding:4px 12px;background:var(--surf3);border-radius:7px;font-size:.73rem;color:var(--grn);font-family:'JetBrains Mono',monospace;display:none;word-break:break-all}
+
+/* ── TEXTAREA / INPUT ───────────────────────── */
+.inp{width:100%;padding:10px 14px;background:var(--surf2);border:1px solid var(--bord2);border-radius:10px;color:var(--txt);font-family:'Outfit',sans-serif;font-size:.88rem;transition:border-color .2s,box-shadow .2s}
+.ta{resize:vertical;min-height:110px;line-height:1.65;font-family:'JetBrains Mono',monospace;font-size:.79rem;padding:12px 14px}
+.inp:focus,.ta:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px rgba(79,156,249,.12)}
+.flbl{display:block;font-size:.67rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);margin-bottom:6px}
+.field{margin-bottom:14px}
+
+/* ── BUTTONS ────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 28px;border-radius:11px;border:none;font-family:'Outfit',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.01em}
+.btn-p{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;box-shadow:0 4px 20px rgba(79,156,249,.28);width:100%}
+.btn-p:hover{opacity:.88;transform:translateY(-2px);box-shadow:0 8px 32px rgba(79,156,249,.4)}
+.btn-p:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-o{background:var(--surf2);color:var(--txt);border:1px solid var(--bord2);width:100%}
+.btn-o:hover{border-color:var(--acc);color:var(--acc)}
+.btn-hero{padding:14px 36px;border-radius:12px;font-size:1rem;width:auto}
+.btn-ghost{background:transparent;color:var(--sub);border:1px solid var(--bord2);width:auto;padding:13px 28px;border-radius:12px;font-size:1rem}
+.btn-ghost:hover{border-color:var(--bord);color:var(--txt)}
+.tab-strip{display:flex;gap:3px;background:var(--surf2);border-radius:10px;padding:3px;margin-bottom:14px;border:1px solid var(--bord)}
+.tp{padding:7px 15px;border-radius:7px;border:none;background:transparent;color:var(--sub);font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:.05em}
+.tp.active{background:var(--surf);color:var(--acc);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+
+/* ── SEC HEADING ────────────────────────────── */
+.sec{display:flex;align-items:center;gap:12px;margin:30px 0 16px;font-size:.67rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--acc)}
+.sec::after{content:'';flex:1;height:1px;background:var(--bord)}
+
+/* ── CHIPS ──────────────────────────────────── */
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.chip{padding:5px 13px;border-radius:99px;font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:600;border:1px solid;transition:transform .15s;cursor:default}
+.chip:hover{transform:scale(1.05)}
+.c-hit{background:rgba(34,197,94,.1);color:var(--grn);border-color:rgba(34,197,94,.3)}
+.c-miss{background:rgba(239,68,68,.08);color:var(--red);border-color:rgba(239,68,68,.22)}
+
+/* ── DIFF BOX ───────────────────────────────── */
+.diff-box{background:var(--surf2);border:1px solid var(--bord);border-radius:10px;padding:14px;font-family:'JetBrains Mono',monospace;font-size:.77rem;line-height:1.85;max-height:280px;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+.diff-box::-webkit-scrollbar{width:4px}
+.diff-box::-webkit-scrollbar-thumb{background:var(--bord2);border-radius:4px}
+mark.kw-hit{background:rgba(34,197,94,.25);color:var(--grn);border-radius:3px;padding:1px 4px}
+mark.kw-miss{background:rgba(239,68,68,.18);color:var(--red);border-radius:3px;padding:1px 4px}
+
+/* ── PROGRESS ───────────────────────────────── */
+.pb-lbl{font-size:.77rem;color:var(--sub);margin-bottom:7px;font-weight:500}
+.pb{height:6px;background:var(--surf3);border-radius:99px;overflow:hidden}
+.pb-f{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width 1s cubic-bezier(.16,1,.3,1)}
+
+/* ── ALERTS ─────────────────────────────────── */
+.al{padding:12px 16px;border-radius:10px;font-size:.86rem;font-weight:500;display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}
+.al-s{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.22);color:var(--grn)}
+.al-w{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.22);color:var(--orn)}
+.al-d{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:var(--red)}
+.al-i{background:rgba(79,156,249,.08);border:1px solid rgba(79,156,249,.22);color:var(--acc)}
+
+/* ── LOADER ─────────────────────────────────── */
+.loader{display:none;flex-direction:column;align-items:center;gap:14px;padding:52px;text-align:center}
+.loader.show{display:flex}
+.spin{width:42px;height:42px;border:3px solid var(--bord2);border-top-color:var(--acc);border-radius:50%;animation:spin .75s linear infinite}
+.loader p{color:var(--sub);font-size:.86rem;font-weight:500}
+
+/* ── TABLE ──────────────────────────────────── */
+.dtbl{width:100%;border-collapse:collapse;font-size:.84rem}
+.dtbl th{padding:9px 13px;text-align:left;font-size:.66rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);border-bottom:1px solid var(--bord)}
+.dtbl td{padding:11px 13px;border-bottom:1px solid var(--bord);vertical-align:middle}
+.dtbl tr:last-child td{border-bottom:none}
+.dtbl tr:hover td{background:var(--surf2)}
+
+/* ── OMR ────────────────────────────────────── */
+.omr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:7px;margin-top:10px}
+.omr-cell{background:var(--surf2);border:1px solid var(--bord);border-radius:8px;padding:7px 11px;display:flex;align-items:center;justify-content:space-between;font-size:.81rem}
+.omr-q{font-weight:700;color:var(--sub)}
+.omr-a{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:.88rem}
+.c-ok{color:var(--grn)}.c-wr{color:var(--red)}.c-bl{color:var(--sub)}
+.ak-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:7px;margin-top:10px;max-height:320px;overflow-y:auto;padding-right:3px}
+.ak-row{display:flex;flex-direction:column;gap:4px;align-items:center;background:var(--surf2);border:1px solid var(--bord);border-radius:8px;padding:7px}
+.ak-lbl{font-size:.67rem;font-weight:700;color:var(--sub);letter-spacing:.06em}
+.ak-sel{background:var(--surf3);border:1px solid var(--bord2);border-radius:6px;color:var(--txt);font-family:'JetBrains Mono',monospace;font-size:.8rem;font-weight:700;padding:4px 6px;cursor:pointer;width:100%;text-align:center}
+
+/* ── HISTORY ────────────────────────────────── */
+.hist-row{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--bord);transition:background .15s}
+.hist-row:last-child{border-bottom:none}
+.hist-row:hover{background:var(--surf2)}
+.hist-lbl{font-weight:600;font-size:.87rem;margin-bottom:2px}
+.hist-t{font-size:.71rem;color:var(--sub)}
+.hist-sc{font-family:'JetBrains Mono',monospace;font-weight:800;color:var(--acc);font-size:.95rem}
+
+/* ── EXPANDER ───────────────────────────────── */
+details.exp{border:1px solid var(--bord);border-radius:10px;margin-bottom:9px;overflow:hidden;background:var(--surf)}
+details.exp summary{padding:12px 16px;font-weight:600;cursor:pointer;font-size:.87rem;list-style:none;display:flex;justify-content:space-between;align-items:center;user-select:none}
+details.exp summary::-webkit-details-marker{display:none}
+details.exp summary::after{content:'›';font-size:1.1rem;color:var(--sub);transform:rotate(90deg);transition:transform .2s}
+details.exp[open] summary::after{transform:rotate(-90deg)}
+details.exp .eb{padding:14px 16px;border-top:1px solid var(--bord)}
+
+/* ── TOGGLE ─────────────────────────────────── */
+.tgl{position:relative;width:40px;height:22px;flex-shrink:0}
+.tgl input{opacity:0;width:0;height:0}
+.tgl-sl{position:absolute;inset:0;background:var(--surf3);border-radius:99px;cursor:pointer;transition:.2s;border:1px solid var(--bord2)}
+.tgl input:checked+.tgl-sl{background:var(--acc)}
+.tgl-sl::before{content:'';position:absolute;width:16px;height:16px;left:3px;top:2px;background:#fff;border-radius:50%;transition:.2s}
+.tgl input:checked+.tgl-sl::before{transform:translateX(17px)}
+.tgl-row{display:flex;align-items:center;gap:10px}
+.tgl-lbl{font-size:.82rem;font-weight:600;color:var(--sub)}
+
+/* ── EMPTY ──────────────────────────────────── */
+.empty{text-align:center;padding:60px 24px;color:var(--sub)}
+.empty-ic{font-size:2.8rem;margin-bottom:14px}
+
+/* ── ANIMATIONS ─────────────────────────────── */
+@keyframes fadein{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.an{animation:fadein .4s ease both}
+.d1{animation-delay:.07s}.d2{animation-delay:.14s}.d3{animation-delay:.21s}
+
+/* chart */
+.chart-box{min-height:290px}
+
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-thumb{background:var(--bord2);border-radius:4px}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo" onclick="goHome()">🎓 EvalAI</div>
+  <nav class="topnav" id="topnav" style="display:none">
+    <button class="tnb active" onclick="go('subj',this)">📝 Subjective</button>
+    <button class="tnb" onclick="go('omr',this)">🔘 OMR / MCQ</button>
+    <button class="tnb" onclick="go('multi',this)">🗂 Multi-Q</button>
+    <button class="tnb" onclick="go('batch',this)">👥 Batch</button>
+    <button class="tnb" onclick="go('hist',this)">📋 History</button>
+  </nav>
+  <div class="top-r">
+    <button class="tbtn" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<!-- ══════════ LANDING PAGE ══════════ -->
+<div id="page-home" class="page active">
+
+  <div class="hero-section">
+    <div class="hero-badge">✦ AI-Powered Examination Evaluation</div>
+    <h1 class="hero-title">Grade smarter.<br><span>Not harder.</span></h1>
+    <p class="hero-sub">EvalAI uses semantic NLP and computer vision to evaluate subjective answers, scan OMR sheets, and grade entire classes in seconds — not hours.</p>
+    <div class="hero-actions">
+      <button class="btn btn-p btn-hero" onclick="enterApp()">🚀 Start Evaluating</button>
+      <button class="btn btn-ghost" onclick="scrollToFeatures()">See Features ↓</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-item"><div class="stat-num">NLP</div><div class="stat-lbl">Semantic Scoring</div></div>
+    <div class="stat-item"><div class="stat-num">OMR</div><div class="stat-lbl">Bubble Detection</div></div>
+    <div class="stat-item"><div class="stat-num">∞</div><div class="stat-lbl">Batch Students</div></div>
+    <div class="stat-item"><div class="stat-num">AI</div><div class="stat-lbl">Claude Feedback</div></div>
+    <div class="stat-item"><div class="stat-num">PDF</div><div class="stat-lbl">Report Export</div></div>
+  </div>
+
+  <div id="features" class="feat-grid">
+    <div class="feat-card" onclick="enterAppTo('subj')">
+      <div class="feat-icon">📝</div>
+      <div class="feat-title">Subjective Evaluation</div>
+      <div class="feat-desc">Upload or paste any answer — model vs student. Get semantic similarity score, keyword analysis, side-by-side diff, and AI-generated improvement suggestions.</div>
+      <div class="feat-tag tag-blue">NLP · Semantic AI</div>
+    </div>
+    <div class="feat-card" onclick="enterAppTo('omr')">
+      <div class="feat-icon">🔘</div>
+      <div class="feat-title">OMR / MCQ Scanner</div>
+      <div class="feat-desc">Upload a scanned bubble sheet — OpenCV detects filled circles automatically. Supports JEE Main, NEET, and custom marking schemes (+4/−1/0).</div>
+      <div class="feat-tag tag-pur">OpenCV · JEE · NEET</div>
+    </div>
+    <div class="feat-card" onclick="enterAppTo('multi')">
+      <div class="feat-icon">🗂</div>
+      <div class="feat-title">Multi-Question Mode</div>
+      <div class="feat-desc">Number your questions (Q1, Q2…) and upload a single file. EvalAI auto-splits and evaluates each question independently with its own analytics.</div>
+      <div class="feat-tag tag-grn">Auto-parse · Per-Q Charts</div>
+    </div>
+    <div class="feat-card" onclick="enterAppTo('batch')">
+      <div class="feat-icon">👥</div>
+      <div class="feat-title">Batch Class Grading</div>
+      <div class="feat-desc">Upload one model answer and multiple student files. Get a leaderboard, score distribution, grade pie chart, and CSV export in one click.</div>
+      <div class="feat-tag tag-blue">Class Reports · CSV</div>
+    </div>
+    <div class="feat-card" onclick="enterAppTo('hist')">
+      <div class="feat-icon">📋</div>
+      <div class="feat-title">Session History</div>
+      <div class="feat-desc">Every evaluation is tracked in your session. View score trends over time, compare students, and download full PDF reports.</div>
+      <div class="feat-tag tag-grn">Trend Charts · PDF</div>
+    </div>
+    <div class="feat-card" style="background:linear-gradient(135deg,rgba(79,156,249,.08),rgba(167,139,250,.08));border-color:rgba(79,156,249,.25)">
+      <div class="feat-icon">✨</div>
+      <div class="feat-title">Claude AI Feedback</div>
+      <div class="feat-desc">Powered by Anthropic's Claude — generates specific, paragraph-level improvement suggestions for each student answer. Set your API key to enable.</div>
+      <div class="feat-tag tag-pur">Anthropic · LLM</div>
+    </div>
+  </div>
+
+</div>
+<!-- ══════════ APP WRAPPER ══════════ -->
+<div id="app" style="display:none">
+
+<!-- PAGE: SUBJECTIVE -->
+<div id="page-subj" class="page active">
+<div class="wrap">
+  <div class="section-hero">
+    <h2>Subjective Answer Evaluation</h2>
+    <p>Upload files or type answers directly — no files required. Semantic NLP scoring with AI feedback.</p>
+  </div>
+
+  <!-- SUBJECTIVE SAMPLE FILES PANEL -->
+  <div class="sample-panel" id="sp-subj">
+    <div class="sample-panel-header" onclick="toggleSamplePanel('subj')">
+      <div class="sample-panel-title">
+        <span>📂</span>
+        <span>Try with Sample Files</span>
+        <span id="sp-subj-badge" style="display:none" class="sample-loaded-badge">✓ Loaded</span>
+      </div>
+      <span class="sample-panel-chevron">▼</span>
+    </div>
+    <div class="sample-panel-body">
+      <p class="sample-desc">Load a model answer and student answer from the sample files. Pick any student to compare against the model.</p>
+      <div style="margin-bottom:12px">
+        <div style="font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);margin-bottom:7px">🧠 Model Answer</div>
+        <div class="sample-files-grid">
+          <button class="sample-file-btn" onclick="loadSubjSample('model','jee_physics_model.txt')">
+            <span class="sfb-icon">📄</span><span class="sfb-name">jee_physics_model.txt</span>
+          </button>
+          <button class="sample-file-btn" onclick="loadSubjSample('model','jee_chemistry_model.txt')">
+            <span class="sfb-icon">📄</span><span class="sfb-name">jee_chemistry_model.txt</span>
+          </button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);margin-bottom:7px">👤 Student Answer</div>
+        <div class="sample-files-grid">
+          <button class="sample-file-btn" onclick="loadSubjSample('student','arpit_sharma_physics.txt')">
+            <span class="sfb-icon">👤</span><span class="sfb-name">arpit_sharma_physics.txt</span>
+          </button>
+          <button class="sample-file-btn" onclick="loadSubjSample('student','rahul_verma_physics.txt')">
+            <span class="sfb-icon">👤</span><span class="sfb-name">rahul_verma_physics.txt</span>
+          </button>
+          <button class="sample-file-btn" onclick="loadSubjSample('student','priya_patel_physics.txt')">
+            <span class="sfb-icon">👤</span><span class="sfb-name">priya_patel_physics.txt</span>
+          </button>
+        </div>
+      </div>
+      <button class="sample-load-all" onclick="loadSubjAll()" style="margin-top:14px">
+        ✨ Load Default Set (Physics Model + Arpit)
+      </button>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-bottom:14px">
+    <!-- Model Answer -->
+    <div class="card">
+      <p class="card-title">🧠 Model / Reference Answer <span style="color:var(--red)">*</span></p>
+      <div class="tab-strip">
+        <button class="tp active" onclick="stab('m','file',this)">📁 Upload File</button>
+        <button class="tp" onclick="stab('m','text',this)">✏️ Type / Paste</button>
+      </div>
+      <div id="m-file">
+        <div class="uzone" id="uz-m" onclick="document.getElementById('f-m').click()">
+          <input type="file" id="f-m" accept=".txt,.pdf,.png,.jpg,.jpeg" onchange="setF('uz-m','fn-m',this)">
+          <div class="uz-ic">📄</div>
+          <div class="uz-txt">Click to upload or drag & drop<br><span style="font-size:.72rem">.txt .pdf .png .jpg</span></div>
+          <div class="uz-name" id="fn-m"></div>
+        </div>
+      </div>
+      <div id="m-text" style="display:none">
+        <textarea class="inp ta" id="ta-m" rows="7" placeholder="Paste the model / reference answer here…"></textarea>
+      </div>
+    </div>
+
+    <!-- Student Answer -->
+    <div class="card">
+      <p class="card-title">👤 Student Answer <span style="color:var(--red)">*</span></p>
+      <div class="tab-strip">
+        <button class="tp active" onclick="stab('s','file',this)">📁 Upload File</button>
+        <button class="tp" onclick="stab('s','text',this)">✏️ Type / Paste</button>
+      </div>
+      <div id="s-file">
+        <div class="uzone" id="uz-s" onclick="document.getElementById('f-s').click()">
+          <input type="file" id="f-s" accept=".txt,.pdf,.png,.jpg,.jpeg" onchange="setF('uz-s','fn-s',this)">
+          <div class="uz-ic">👤</div>
+          <div class="uz-txt">Click to upload or drag & drop<br><span style="font-size:.72rem">.txt .pdf .png .jpg</span></div>
+          <div class="uz-name" id="fn-s"></div>
+        </div>
+      </div>
+      <div id="s-text" style="display:none">
+        <textarea class="inp ta" id="ta-s" rows="7" placeholder="Paste the student's answer here…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-bottom:20px">
+    <div class="field">
+      <label class="flbl">Student Name (optional)</label>
+      <input class="inp" type="text" id="sname" placeholder="e.g. Arpit Sharma">
+    </div>
+    <div style="display:flex;flex-direction:column;justify-content:flex-end;gap:8px">
+      <div class="tgl-row">
+        <label class="tgl"><input type="checkbox" id="ai-tgl"><span class="tgl-sl"></span></label>
+        <span class="tgl-lbl">✨ Enable Claude AI Feedback</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:400px;margin-bottom:24px">
+    <button class="btn btn-p" id="eval-btn" onclick="runEval()">🚀 Evaluate Answer</button>
+  </div>
+
+  <div class="loader" id="ld-s"><div class="spin"></div><p>Running semantic NLP analysis…</p></div>
+
+  <div id="results" style="display:none">
+    <div class="sec">📊 Results</div>
+    <div class="g3">
+      <div class="card an"><p class="card-title">Semantic Similarity</p><p class="mv" id="mv1">—</p><span id="bd1"></span></div>
+      <div class="card an d1"><p class="card-title">Keywords Matched</p><p class="mv" id="mv2">—</p><span id="bd2"></span></div>
+      <div class="card an d2"><p class="card-title">Final Score</p><p class="mv" id="mv3">—</p><span id="bd3"></span></div>
+    </div>
+    <div class="sec">📈 Analytics</div>
+    <div class="g2">
+      <div class="card"><p class="card-title">Rubric Radar</p><div class="chart-box" id="c-radar"></div></div>
+      <div class="card"><p class="card-title">Score Gauge</p><div class="chart-box" id="c-gauge"></div></div>
+    </div>
+    <div class="sec">🔑 Keyword Analysis</div>
+    <div class="card">
+      <div class="pb-lbl" id="kw-lbl"></div>
+      <div class="pb"><div class="pb-f" id="kw-f" style="width:0%"></div></div>
+      <div class="chips" id="kw-chips"></div>
+    </div>
+    <div class="sec">🔍 Answer Comparison</div>
+    <div class="g2">
+      <div class="card"><p class="card-title">📘 Model Answer</p><div class="diff-box" id="diff-m"></div></div>
+      <div class="card"><p class="card-title">📝 Student — Highlighted</p><div class="diff-box" id="diff-s"></div></div>
+    </div>
+    <div class="sec">💬 Feedback</div>
+    <div class="g2">
+      <div class="card"><div id="fb-main"></div></div>
+      <div class="card">
+        <p class="card-title">💡 Suggestions</p>
+        <div id="fb-tips"></div>
+        <div id="ai-box" style="display:none;margin-top:10px">
+          <p class="card-title">✨ Claude AI Analysis</p>
+          <div class="diff-box" id="ai-txt" style="background:rgba(167,139,250,.05);border-color:var(--acc2)"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sec">📥 Export</div>
+    <div class="g2">
+      <button class="btn btn-o" onclick="dlTxt()">📄 Download TXT Report</button>
+      <button class="btn btn-o" onclick="dlPdf()">📑 Download PDF Report</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- PAGE: OMR -->
+<div id="page-omr" class="page">
+<div class="wrap">
+  <div class="section-hero">
+    <h2>OMR Sheet / MCQ Evaluator</h2>
+    <p>Upload a scanned bubble sheet — AI detects filled bubbles via OpenCV. JEE, NEET, and custom marking supported.</p>
+  </div>
+
+  <!-- OMR SAMPLE FILES PANEL -->
+  <div class="sample-panel" id="sp-omr">
+    <div class="sample-panel-header" onclick="toggleSamplePanel('omr')">
+      <div class="sample-panel-title">
+        <span>📂</span>
+        <span>Try with Sample OMR Sheets</span>
+        <span id="sp-omr-badge" style="display:none" class="sample-loaded-badge">✓ Loaded</span>
+      </div>
+      <span class="sample-panel-chevron">▼</span>
+    </div>
+    <div class="sample-panel-body">
+      <p class="sample-desc">Load a sample scanned OMR sheet image. The answer key will auto-fill. Choose any sheet to test bubble detection.</p>
+      <div style="margin-bottom:12px">
+        <div style="font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);margin-bottom:7px">🖼️ OMR Sheet Images</div>
+        <div class="sample-files-grid">
+          <button class="sample-file-btn" onclick="loadOMRSample('jee_omr_arpit.png','arpit')">
+            <span class="sfb-icon">🖼️</span><span class="sfb-name">jee_omr_arpit.png</span>
+          </button>
+          <button class="sample-file-btn" onclick="loadOMRSample('jee_omr_rahul.png','rahul')">
+            <span class="sfb-icon">🖼️</span><span class="sfb-name">jee_omr_rahul.png</span>
+          </button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);margin-bottom:7px">📋 Answer Key Reference</div>
+        <div class="sample-files-grid">
+          <button class="sample-file-btn" onclick="loadOMRAnswerKey()">
+            <span class="sfb-icon">📋</span><span class="sfb-name">answer_key_reference.txt</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-bottom:14px">
+    <div class="card">
+      <p class="card-title">📷 OMR Sheet Image</p>
+      <div class="uzone" id="uz-omr" onclick="document.getElementById('f-omr').click()">
+        <input type="file" id="f-omr" accept=".png,.jpg,.jpeg" onchange="setF('uz-omr','fn-omr',this)">
+        <div class="uz-ic">🖼️</div>
+        <div class="uz-txt">Upload scanned OMR image or drag & drop<br><span style="font-size:.71rem">.png · .jpg · 300 DPI+ recommended</span></div>
+        <div class="uz-name" id="fn-omr"></div>
+      </div>
+      <div class="g2" style="margin-top:14px">
+        <div class="field"><label class="flbl">No. of Questions</label><input class="inp" type="number" id="omr-nq" value="30" min="1" max="200"></div>
+        <div class="field"><label class="flbl">Options per Q</label>
+          <select class="inp" id="omr-opts"><option value="4">4 (A B C D)</option><option value="5">5 (A B C D E)</option><option value="3">3 (A B C)</option></select>
+        </div>
+      </div>
+      <button class="btn btn-p" style="margin-top:10px" onclick="scanOMR()">🔍 Scan OMR Sheet</button>
+    </div>
+
+    <div class="card">
+      <p class="card-title">📋 Answer Key</p>
+      <p style="font-size:.78rem;color:var(--sub);margin-bottom:12px">Paste comma-separated key or fill dropdowns. You can also load the sample answer key above.</p>
+      <div class="field">
+        <label class="flbl">Paste Key (comma-separated)</label>
+        <input class="inp" type="text" id="ak-paste" placeholder="A,B,C,D,A,C,B,D…" oninput="parseAK()">
+      </div>
+      <div class="field">
+        <label class="flbl">Marking Scheme</label>
+        <select class="inp" id="ms-pre" onchange="msChange()">
+          <option value="jee">JEE Main (+4 / −1 / 0)</option>
+          <option value="neet">NEET (+4 / −1 / 0)</option>
+          <option value="simple">Simple (+1 / 0 / 0)</option>
+          <option value="custom">Custom…</option>
+        </select>
+      </div>
+      <div id="ms-cust" style="display:none" class="g3">
+        <div class="field"><label class="flbl">Correct</label><input class="inp" type="number" id="ms-c" value="4"></div>
+        <div class="field"><label class="flbl">Wrong</label><input class="inp" type="number" id="ms-w" value="-1"></div>
+        <div class="field"><label class="flbl">Blank</label><input class="inp" type="number" id="ms-b" value="0"></div>
+      </div>
+      <div class="ak-grid" id="ak-grid"></div>
+    </div>
+  </div>
+
+  <div class="loader" id="ld-omr"><div class="spin"></div><p id="omr-ld-t">Scanning…</p></div>
+
+  <div id="omr-scan-res" style="display:none">
+    <div class="sec">🔍 Detected Answers — Review Before Grading</div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="g2" style="margin-bottom:14px">
+        <div><p class="card-title">Detected from Image</p><div class="omr-grid" id="det-grid"></div></div>
+        <div><p class="card-title">Correct if Wrong</p><p style="font-size:.77rem;color:var(--sub);margin-bottom:8px">Override any misdetected answer before grading.</p><div class="ak-grid" id="edit-grid"></div></div>
+      </div>
+      <button class="btn btn-p" onclick="gradeOMR()">📊 Grade Now</button>
+    </div>
+  </div>
+
+  <div id="omr-grade-res" style="display:none">
+    <div class="sec">📊 MCQ Results</div>
+    <div class="g4" id="omr-mets" style="margin-bottom:16px"></div>
+    <div class="g2" style="margin-bottom:16px">
+      <div class="card"><p class="card-title">Distribution</p><div class="chart-box" id="omr-donut"></div></div>
+      <div class="card"><p class="card-title">Question Detail</p>
+        <div style="max-height:320px;overflow-y:auto">
+          <table class="dtbl"><thead><tr><th>Q#</th><th>Student</th><th>Key</th><th>Status</th></tr></thead>
+          <tbody id="omr-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+    <div style="max-width:360px"><button class="btn btn-o" onclick="dlOMR()">📊 Download CSV</button></div>
+  </div>
+</div>
+</div>
+
+<!-- PAGE: MULTI-Q -->
+<div id="page-multi" class="page">
+<div class="wrap">
+  <div class="section-hero">
+    <h2>Multi-Question Evaluator</h2>
+    <p>Auto-parses numbered questions and grades each one independently. Upload files or type directly.</p>
+  </div>
+
+  <!-- MULTI-Q SAMPLE FILES PANEL -->
+  <div class="sample-panel" id="sp-multi">
+    <div class="sample-panel-header" onclick="toggleSamplePanel('multi')">
+      <div class="sample-panel-title">
+        <span>📂</span>
+        <span>Try with Sample Files</span>
+        <span id="sp-multi-badge" style="display:none" class="sample-loaded-badge">✓ Loaded</span>
+      </div>
+      <span class="sample-panel-chevron">▼</span>
+    </div>
+    <div class="sample-panel-body">
+      <p class="sample-desc">Load multi-question answer files. Both model and student files contain answers numbered Q1, Q2… which EvalAI auto-parses.</p>
+      <div style="margin-bottom:12px">
+        <div style="font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);margin-bottom:7px">🧠 Model Answers</div>
+        <div class="sample-files-grid">
+          <button class="sample-file-btn" onclick="loadMultiSample('model','model_answers_5q.txt')">
+            <span class="sfb-icon">📄</span><span class="sfb-name">model_answers_5q.txt</span>
+          </button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);margin-bottom:7px">👤 Student Answers</div>
+        <div class="sample-files-grid">
+          <button class="sample-file-btn" onclick="loadMultiSample('student','student_answers_5q.txt')">
+            <span class="sfb-icon">📄</span><span class="sfb-name">student_answers_5q.txt</span>
+          </button>
+        </div>
+      </div>
+      <button class="sample-load-all" onclick="loadMultiAll()" style="margin-top:14px">
+        ✨ Load Both Files
+      </button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;padding:12px 18px">
+    <p style="font-size:.82rem;color:var(--sub)">Format: number answers as <code style="background:var(--surf3);padding:2px 8px;border-radius:4px;font-family:'JetBrains Mono',monospace">Q1. answer text</code> or <code style="background:var(--surf3);padding:2px 8px;border-radius:4px;font-family:'JetBrains Mono',monospace">1. answer text</code></p>
+  </div>
+  <div class="g2" style="margin-bottom:14px">
+    <div class="card">
+      <p class="card-title">🧠 Model Answers</p>
+      <div class="tab-strip"><button class="tp active" onclick="stab('mm','file',this)">📁 File</button><button class="tp" onclick="stab('mm','text',this)">✏️ Type</button></div>
+      <div id="mm-file"><div class="uzone" onclick="document.getElementById('f-mm').click()"><input type="file" id="f-mm" accept=".txt,.pdf" onchange="setF('','fn-mm',this)"><div class="uz-ic">🧠</div><div class="uz-txt">Upload file or drag & drop</div><div class="uz-name" id="fn-mm"></div></div></div>
+      <div id="mm-text" style="display:none"><textarea class="inp ta" id="ta-mm" rows="9" placeholder="Q1. Model answer for Q1&#10;Q2. Model answer for Q2&#10;Q3. Model answer for Q3…"></textarea></div>
+    </div>
+    <div class="card">
+      <p class="card-title">👤 Student Answers</p>
+      <div class="tab-strip"><button class="tp active" onclick="stab('ms','file',this)">📁 File</button><button class="tp" onclick="stab('ms','text',this)">✏️ Type</button></div>
+      <div id="ms-file"><div class="uzone" onclick="document.getElementById('f-ms').click()"><input type="file" id="f-ms" accept=".txt,.pdf" onchange="setF('','fn-ms',this)"><div class="uz-ic">👤</div><div class="uz-txt">Upload file or drag & drop</div><div class="uz-name" id="fn-ms"></div></div></div>
+      <div id="ms-text" style="display:none"><textarea class="inp ta" id="ta-ms" rows="9" placeholder="Q1. Student's answer for Q1&#10;Q2. Student's answer for Q2&#10;Q3. Student's answer for Q3…"></textarea></div>
+    </div>
+  </div>
+  <div style="max-width:380px"><button class="btn btn-p" onclick="runMulti()">🚀 Evaluate All Questions</button></div>
+  <div class="loader" id="ld-m"><div class="spin"></div><p>Evaluating questions…</p></div>
+  <div id="multi-res" style="display:none"></div>
+</div>
+</div>
+
+<!-- PAGE: BATCH -->
+<div id="page-batch" class="page">
+<div class="wrap">
+  <div class="section-hero">
+    <h2>Batch Student Grading</h2>
+    <p>Grade an entire class in seconds. One model answer + multiple student files.</p>
+  </div>
+
+  <!-- BATCH SAMPLE FILES PANEL -->
+  <div class="sample-panel" id="sp-batch">
+    <div class="sample-panel-header" onclick="toggleSamplePanel('batch')">
+      <div class="sample-panel-title">
+        <span>📂</span>
+        <span>Try with Sample Class Files</span>
+        <span id="sp-batch-badge" style="display:none" class="sample-loaded-badge">✓ Loaded</span>
+      </div>
+      <span class="sample-panel-chevron">▼</span>
+    </div>
+    <div class="sample-panel-body">
+      <p class="sample-desc">Load a model answer and pick which student files to include. All 5 students will be graded in one run.</p>
+      <div style="margin-bottom:12px">
+        <div style="font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);margin-bottom:7px">🧠 Model Answer</div>
+        <div class="sample-files-grid">
+          <button class="sample-file-btn" onclick="loadBatchModel('jee_physics_model.txt')">
+            <span class="sfb-icon">📄</span><span class="sfb-name">jee_physics_model.txt</span>
+          </button>
+          <button class="sample-file-btn" onclick="loadBatchModel('jee_chemistry_model.txt')">
+            <span class="sfb-icon">📄</span><span class="sfb-name">jee_chemistry_model.txt</span>
+          </button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);margin-bottom:7px">👥 Student Files</div>
+        <div class="sample-files-grid" id="batch-student-btns">
+          <button class="sample-file-btn" onclick="toggleBatchStudent('ananya_singh.txt',this)">
+            <span class="sfb-icon">👤</span><span class="sfb-name">ananya_singh.txt</span>
+          </button>
+          <button class="sample-file-btn" onclick="toggleBatchStudent('meera_nair.txt',this)">
+            <span class="sfb-icon">👤</span><span class="sfb-name">meera_nair.txt</span>
+          </button>
+          <button class="sample-file-btn" onclick="toggleBatchStudent('rohit_kumar.txt',this)">
+            <span class="sfb-icon">👤</span><span class="sfb-name">rohit_kumar.txt</span>
+          </button>
+          <button class="sample-file-btn" onclick="toggleBatchStudent('sneha_desai.txt',this)">
+            <span class="sfb-icon">👤</span><span class="sfb-name">sneha_desai.txt</span>
+          </button>
+          <button class="sample-file-btn" onclick="toggleBatchStudent('vikram_joshi.txt',this)">
+            <span class="sfb-icon">👤</span><span class="sfb-name">vikram_joshi.txt</span>
+          </button>
+        </div>
+      </div>
+      <button class="sample-load-all" onclick="loadBatchAll()" style="margin-top:14px">
+        ✨ Load All 5 Students
+      </button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <p class="card-title">🧠 Model Answer</p>
+    <div class="tab-strip"><button class="tp active" onclick="stab('bm','file',this)">📁 File</button><button class="tp" onclick="stab('bm','text',this)">✏️ Type</button></div>
+    <div id="bm-file"><div class="uzone" onclick="document.getElementById('f-bm').click()"><input type="file" id="f-bm" accept=".txt,.pdf" onchange="setF('','fn-bm',this)"><div class="uz-ic">🧠</div><div class="uz-txt">Upload model answer file or drag & drop</div><div class="uz-name" id="fn-bm"></div></div></div>
+    <div id="bm-text" style="display:none"><textarea class="inp ta" id="ta-bm" rows="5" placeholder="Paste model answer here…"></textarea></div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <p class="card-title">👥 Student Answers <span style="color:var(--sub);font-size:.65rem">(select multiple)</span></p>
+    <div class="uzone" id="uz-bs" onclick="document.getElementById('f-bs').click()">
+      <input type="file" id="f-bs" accept=".txt,.pdf" multiple onchange="setBatch(this)">
+      <div class="uz-ic">👥</div>
+      <div class="uz-txt">Click to select multiple student files or drag & drop<br><span style="font-size:.72rem">Name files with student names — e.g. arpit.txt, rahul.txt</span></div>
+      <div class="uz-name" id="fn-bs"></div>
+    </div>
+  </div>
+  <div style="max-width:380px"><button class="btn btn-p" onclick="runBatch()">🚀 Grade Entire Class</button></div>
+  <div class="loader" id="ld-b"><div class="spin"></div><p>Grading students…</p></div>
+  <div id="batch-res" style="display:none"></div>
+</div>
+</div>
+
+<!-- PAGE: HISTORY -->
+<div id="page-hist" class="page">
+<div class="wrap">
+  <div class="section-hero"><h2>Evaluation History</h2><p>All evaluations from this session with score trends.</p></div>
+  <div id="hist-cnt"><div class="empty"><div class="empty-ic">📭</div><p>No evaluations yet.</p></div></div>
+</div>
+</div>
+
+</div><!-- /app -->
+
+<script>
+/* ══ STATE ══════════════════════════════════ */
+let dark=true,hist=[],lastR=null,lastSname="";
+let omrDet={},omrGR=null;
+const rubric=[{criterion:"Accuracy",weight:40},{criterion:"Completeness",weight:35},{criterion:"Clarity",weight:25}];
+
+/* ── SAMPLE STATE ── */
+let batchSampleStudents = new Set();
+let batchSampleModelFile = null;
+
+/* ══ THEME ══════════════════════════════════ */
+function toggleTheme(){dark=!dark;document.body.classList.toggle("light",!dark);document.querySelector(".tbtn").textContent=dark?"🌙":"☀️";if(lastR)renderCharts(lastR)}
+
+/* ══ HOME / APP ═════════════════════════════ */
+function goHome(){
+  document.getElementById("app").style.display="none";
+  document.getElementById("page-home").classList.add("active");
+  document.getElementById("topnav").style.display="none";
+}
+function enterApp(){
+  document.getElementById("page-home").classList.remove("active");
+  document.getElementById("app").style.display="block";
+  document.getElementById("topnav").style.display="flex";
+  showPage("subj");
+}
+function enterAppTo(id){
+  document.getElementById("page-home").classList.remove("active");
+  document.getElementById("app").style.display="block";
+  document.getElementById("topnav").style.display="flex";
+  showPage(id);
+  document.querySelectorAll(".tnb").forEach(b=>{
+    b.classList.toggle("active",b.getAttribute("onclick").includes("'"+id+"'"));
+  });
+}
+function scrollToFeatures(){document.getElementById("features").scrollIntoView({behavior:"smooth"})}
+
+function showPage(id){
+  document.querySelectorAll("#app .page").forEach(p=>p.classList.remove("active"));
+  document.getElementById("page-"+id).classList.add("active");
+}
+function go(id,btn){
+  showPage(id);
+  document.querySelectorAll(".tnb").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  if(id==="hist") renderHist();
+}
+
+/* ══ TAB SWITCH ═════════════════════════════ */
+function stab(prefix,mode,btn){
+  ["file","text"].forEach(m=>{const el=document.getElementById(prefix+"-"+m);if(el)el.style.display=m===mode?"block":"none"});
+  btn.closest(".tab-strip").querySelectorAll(".tp").forEach(p=>p.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+/* ══ UPLOAD ═════════════════════════════════ */
+function setF(zid,nid,inp){
+  const el=document.getElementById(nid);
+  if(inp.files[0]){el.textContent=inp.files[0].name;el.style.display="block";if(zid)document.getElementById(zid).classList.add("ok")}
+}
+function setBatch(inp){const el=document.getElementById("fn-bs");el.textContent=`${inp.files.length} files selected`;el.style.display="block";document.getElementById("uz-bs").classList.add("ok")}
+document.querySelectorAll(".uzone").forEach(z=>{z.addEventListener("dragover",e=>{e.preventDefault();z.classList.add("drag")});z.addEventListener("dragleave",()=>z.classList.remove("drag"));z.addEventListener("drop",e=>{e.preventDefault();z.classList.remove("drag")})});
+
+/* ══ HELPERS ════════════════════════════════ */
+function esc(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function set(id,html){document.getElementById(id).innerHTML=html}
+function show(id){document.getElementById(id).classList.add("show")}
+function hide(id){document.getElementById(id).classList.remove("show")}
+function bdg(v,t1=.7,t2=.4,ls=["Excellent","Good","Needs Work"]){
+  const[cls,l]=v>t1?["b-g",ls[0]]:v>t2?["b-o",ls[1]]:["b-r",ls[2]];
+  return`<span class="badge ${cls}">● ${l}</span>`;
+}
+function sc(v,t1=7,t2=4){return v>t1?"var(--grn)":v>t2?"var(--orn)":"var(--red)"}
+function hl(txt,kws,matched){
+  let o=esc(txt);
+  kws.forEach(k=>{
+    const cls=matched.includes(k)?"kw-hit":"kw-miss";
+    o=o.replace(new RegExp(`\\b(${k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")})\\b`,"gi"),`<mark class="${cls}">$1</mark>`);
+  });
+  return o;
+}
+function dl(blob,name){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click()}
+function dlCsv(c,n){dl(new Blob([c],{type:"text/csv"}),n)}
+
+/* ══ SAMPLE PANEL TOGGLE ════════════════════ */
+function toggleSamplePanel(id){
+  const panel=document.getElementById("sp-"+id);
+  panel.classList.toggle("open");
+}
+
+/* ══ FETCH SAMPLE FILE AS BLOB ══════════════ */
+async function fetchSampleFile(folder,filename){
+  const res=await fetch(`/static/sample_files/${folder}/${filename}`);
+  if(!res.ok) throw new Error(`Cannot load ${filename}`);
+  const blob=await res.blob();
+  return new File([blob],filename,{type:blob.type||"text/plain"});
+}
+
+/* ══ HELPER: inject file into input ════════ */
+function injectFile(inputId,uzId,nameId,file){
+  const dt=new DataTransfer();
+  dt.items.add(file);
+  const inp=document.getElementById(inputId);
+  inp.files=dt.files;
+  const nm=document.getElementById(nameId);
+  nm.textContent=file.name;
+  nm.style.display="block";
+  if(uzId)document.getElementById(uzId).classList.add("ok");
+}
+
+/* ══ SUBJECTIVE SAMPLES ═════════════════════ */
+async function loadSubjSample(role,filename){
+  try{
+    const folder="subjective";
+    const file=await fetchSampleFile(folder,filename);
+    if(role==="model"){
+      injectFile("f-m","uz-m","fn-m",file);
+    } else {
+      injectFile("f-s","uz-s","fn-s",file);
+      const nm=filename.replace(".txt","").replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase());
+      document.getElementById("sname").value=nm;
+    }
+    document.getElementById("sp-subj-badge").style.display="inline-flex";
+  }catch(e){alert("Could not load sample: "+e.message)}
+}
+async function loadSubjAll(){
+  try{
+    const mf=await fetchSampleFile("subjective","jee_physics_model.txt");
+    const sf=await fetchSampleFile("subjective","arpit_sharma_physics.txt");
+    injectFile("f-m","uz-m","fn-m",mf);
+    injectFile("f-s","uz-s","fn-s",sf);
+    document.getElementById("sname").value="Arpit Sharma";
+    document.getElementById("sp-subj-badge").style.display="inline-flex";
+    // switch to file tab
+    document.querySelectorAll("#page-subj .tab-strip")[0].querySelectorAll(".tp")[0].click();
+    document.querySelectorAll("#page-subj .tab-strip")[1].querySelectorAll(".tp")[0].click();
+  }catch(e){alert("Could not load samples: "+e.message)}
+}
+
+/* ══ OMR SAMPLES ════════════════════════════ */
+async function loadOMRSample(filename,studentName){
+  try{
+    const file=await fetchSampleFile("omr",filename);
+    injectFile("f-omr","uz-omr","fn-omr",file);
+    document.getElementById("sp-omr-badge").style.display="inline-flex";
+  }catch(e){alert("Could not load sample: "+e.message)}
+}
+async function loadOMRAnswerKey(){
+  try{
+    const res=await fetch("/static/sample_files/omr/answer_key_reference.txt");
+    const txt=await res.text();
+    // parse first line that looks like A,B,C,D...
+    const keyLine=txt.split("\n").find(l=>/^[ABCDE?,\s]+$/i.test(l.trim()));
+    if(keyLine){
+      document.getElementById("ak-paste").value=keyLine.trim();
+      parseAK();
+      document.getElementById("sp-omr-badge").style.display="inline-flex";
+    } else {
+      alert("Could not parse answer key from file.");
+    }
+  }catch(e){alert("Could not load answer key: "+e.message)}
+}
+
+/* ══ MULTI-Q SAMPLES ════════════════════════ */
+async function loadMultiSample(role,filename){
+  try{
+    const file=await fetchSampleFile("omr",filename);
+    if(role==="model"){
+      injectFile("f-mm","","fn-mm",file);
+    } else {
+      injectFile("f-ms","","fn-ms",file);
+    }
+    document.getElementById("sp-multi-badge").style.display="inline-flex";
+  }catch(e){alert("Could not load sample: "+e.message)}
+}
+async function loadMultiAll(){
+  try{
+    const mf=await fetchSampleFile("omr","model_answers_5q.txt");
+    const sf=await fetchSampleFile("omr","student_answers_5q.txt");
+    injectFile("f-mm","","fn-mm",mf);
+    injectFile("f-ms","","fn-ms",sf);
+    document.getElementById("sp-multi-badge").style.display="inline-flex";
+    // make sure file tabs are active
+    document.querySelectorAll("#page-multi .tab-strip")[0].querySelectorAll(".tp")[0].click();
+    document.querySelectorAll("#page-multi .tab-strip")[1].querySelectorAll(".tp")[0].click();
+  }catch(e){alert("Could not load samples: "+e.message)}
+}
+
+/* ══ BATCH SAMPLES ══════════════════════════ */
+async function loadBatchModel(filename){
+  try{
+    const file=await fetchSampleFile("subjective",filename);
+    injectFile("f-bm","","fn-bm",file);
+    batchSampleModelFile=file;
+    document.getElementById("sp-batch-badge").style.display="inline-flex";
+    // switch to file tab
+    document.querySelectorAll("#page-batch .tab-strip")[0].querySelectorAll(".tp")[0].click();
+  }catch(e){alert("Could not load sample: "+e.message)}
+}
+
+async function toggleBatchStudent(filename,btn){
+  try{
+    if(batchSampleStudents.has(filename)){
+      batchSampleStudents.delete(filename);
+      btn.style.borderColor="";btn.style.color="";btn.style.background="";
+    } else {
+      batchSampleStudents.add(filename);
+      btn.style.borderColor="var(--grn)";btn.style.color="var(--grn)";btn.style.background="rgba(34,197,94,.07)";
+    }
+    await applyBatchStudents();
+  }catch(e){alert("Could not load sample: "+e.message)}
+}
+
+async function applyBatchStudents(){
+  const files=[];
+  for(const fn of batchSampleStudents){
+    files.push(await fetchSampleFile("batch",fn));
+  }
+  if(files.length){
+    const dt=new DataTransfer();
+    files.forEach(f=>dt.items.add(f));
+    document.getElementById("f-bs").files=dt.files;
+    const nm=document.getElementById("fn-bs");
+    nm.textContent=`${files.length} file${files.length>1?"s":""} selected`;
+    nm.style.display="block";
+    document.getElementById("uz-bs").classList.add("ok");
+    document.getElementById("sp-batch-badge").style.display="inline-flex";
+  }
+}
+
+async function loadBatchAll(){
+  try{
+    // Load default model if not already loaded
+    if(!batchSampleModelFile){
+      await loadBatchModel("jee_physics_model.txt");
+    }
+    // Select all students
+    const allStudents=["ananya_singh.txt","meera_nair.txt","rohit_kumar.txt","sneha_desai.txt","vikram_joshi.txt"];
+    batchSampleStudents=new Set(allStudents);
+    // Update button styles
+    document.querySelectorAll("#batch-student-btns .sample-file-btn").forEach(btn=>{
+      btn.style.borderColor="var(--grn)";btn.style.color="var(--grn)";btn.style.background="rgba(34,197,94,.07)";
+    });
+    await applyBatchStudents();
+  }catch(e){alert("Could not load samples: "+e.message)}
+}
+
+/* ══ PLOTLY ═════════════════════════════════ */
+const BG=()=>"rgba(0,0,0,0)",GR=()=>dark?"#1e2d47":"#e2e8f0",FN=()=>dark?"#4d6a8a":"#64748b";
+const PC={displayModeBar:false,responsive:true};
+
+function pRadar(dims,scores,el){
+  Plotly.newPlot(el,[{type:"scatterpolar",r:[...scores,scores[0]],theta:[...dims,dims[0]],fill:"toself",fillcolor:dark?"rgba(79,156,249,.15)":"rgba(37,99,235,.1)",line:{color:"#4f9cf9",width:2.5},marker:{size:7,color:"#a78bfa"}}],{polar:{bgcolor:BG(),radialaxis:{visible:true,range:[0,10],tickfont:{size:9,color:FN()},gridcolor:GR()},angularaxis:{tickfont:{size:11,color:FN()},gridcolor:GR()}},paper_bgcolor:BG(),plot_bgcolor:BG(),font:{color:FN(),family:"Outfit"},margin:{l:60,r:60,t:40,b:40},showlegend:false,height:290},PC);
+}
+function pGauge(score,el){
+  Plotly.newPlot(el,[{type:"indicator",mode:"gauge+number+delta",value:score,delta:{reference:5,valueformat:".1f"},number:{suffix:"/10",font:{size:36,color:"#4f9cf9",family:"Outfit"}},gauge:{axis:{range:[0,10],tickfont:{size:9,color:FN()},nticks:6},bar:{color:"#4f9cf9",thickness:.22},bgcolor:BG(),borderwidth:0,steps:[{range:[0,4],color:dark?"rgba(239,68,68,.12)":"rgba(220,38,38,.07)"},{range:[4,7],color:dark?"rgba(245,158,11,.12)":"rgba(217,119,6,.07)"},{range:[7,10],color:dark?"rgba(34,197,94,.12)":"rgba(22,163,74,.07)"}],threshold:{line:{color:"#a78bfa",width:3},thickness:.85,value:score}}}],{paper_bgcolor:BG(),font:{color:FN(),family:"Outfit"},margin:{l:24,r:24,t:36,b:16},height:290},PC);
+}
+function pBar(lbls,vals,el){
+  Plotly.newPlot(el,[{type:"bar",x:lbls,y:vals,marker:{color:vals.map(v=>v>=7?"#22c55e":v>=4?"#f59e0b":"#ef4444")},text:vals.map(v=>v.toFixed(2)),textposition:"outside",textfont:{family:"Outfit",size:11,color:FN()}}],{paper_bgcolor:BG(),plot_bgcolor:BG(),font:{color:FN(),family:"Outfit"},xaxis:{gridcolor:"rgba(0,0,0,0)"},yaxis:{range:[0,11.5],gridcolor:GR()},margin:{l:30,r:16,t:16,b:36},height:290},PC);
+}
+function pHist(vals,el){Plotly.newPlot(el,[{type:"histogram",x:vals,marker:{color:"#4f9cf9",opacity:.85},xbins:{start:0,end:10,size:1}}],{paper_bgcolor:BG(),plot_bgcolor:BG(),font:{color:FN(),family:"Outfit"},xaxis:{range:[0,10],gridcolor:"rgba(0,0,0,0)"},yaxis:{gridcolor:GR()},bargap:.08,margin:{l:30,r:16,t:16,b:36},height:240},PC)}
+function pPie(labels,values,el){Plotly.newPlot(el,[{type:"pie",labels,values,hole:.45,marker:{colors:["#22c55e","#4f9cf9","#f59e0b","#ef4444"]},textfont:{family:"Outfit"}}],{paper_bgcolor:BG(),font:{color:FN(),family:"Outfit"},margin:{l:16,r:16,t:16,b:16},height:240},PC)}
+function pDonut(c,w,b,el){Plotly.newPlot(el,[{type:"pie",labels:["Correct","Wrong","Unanswered"],values:[c,w,b],hole:.5,marker:{colors:["#22c55e","#ef4444","#4d6a8a"]},textfont:{family:"Outfit",size:12}}],{paper_bgcolor:BG(),font:{color:FN(),family:"Outfit"},margin:{l:16,r:16,t:16,b:16},height:290},PC)}
+function pTrend(items,el){Plotly.newPlot(el,[{type:"scatter",mode:"lines+markers",x:items.map((_,i)=>i+1),y:items.map(h=>h.score),text:items.map(h=>h.label),line:{color:"#4f9cf9",width:2.5},marker:{size:8,color:"#a78bfa"},hovertemplate:"%{text}<br>Score: %{y}<extra></extra>"}],{paper_bgcolor:BG(),plot_bgcolor:BG(),font:{color:FN(),family:"Outfit"},xaxis:{gridcolor:"rgba(0,0,0,0)"},yaxis:{range:[0,10],gridcolor:GR()},margin:{l:36,r:16,t:16,b:36},height:240},PC)}
+
+function renderCharts(r){
+  const dims=rubric.map(x=>x.criterion);
+  const scores=rubric.map((_,i)=>{
+    if(i===0)return r.similarity*10;
+    if(i===1)return(r.matched.length/Math.max(r.keywords.length,1))*10;
+    return(r.similarity*10+(r.matched.length/Math.max(r.keywords.length,1))*10)/2;
+  });
+  pRadar(dims,scores,"c-radar");pGauge(r.score,"c-gauge");
+}
+
+/* ══ FORM HELPER ════════════════════════════ */
+function addRubricToForm(fd){rubric.forEach((r,i)=>{fd.append(`crit${i}`,r.criterion);fd.append(`w${i}`,r.weight)})}
+
+/* ══ SUBJECTIVE EVAL ════════════════════════ */
+async function runEval(){
+  const mf=document.getElementById("f-m").files[0],mt=document.getElementById("ta-m").value.trim();
+  const sf=document.getElementById("f-s").files[0],st=document.getElementById("ta-s").value.trim();
+  if(!mf&&!mt){alert("Provide model answer.");return}
+  if(!sf&&!st){alert("Provide student answer.");return}
+  const fd=new FormData();
+  if(mf)fd.append("model",mf);else fd.append("model_text",mt);
+  if(sf)fd.append("student",sf);else fd.append("student_text",st);
+  addRubricToForm(fd);
+  if(document.getElementById("ai-tgl").checked)fd.append("ai_feedback","1");
+  document.getElementById("results").style.display="none";
+  show("ld-s");document.getElementById("eval-btn").disabled=true;
+  try{
+    const res=await fetch("/api/evaluate",{method:"POST",body:fd});
+    const r=await res.json();
+    if(r.error){alert(r.error);return}
+    lastR=r;lastSname=document.getElementById("sname").value||"Student";
+    hist.push({label:lastSname,time:new Date().toLocaleTimeString(),score:r.score,sim:(r.similarity*100).toFixed(1),kw:`${r.matched.length}/${r.keywords.length}`});
+    fillRes(r);
+  }catch(e){alert("Error: "+e)}
+  finally{hide("ld-s");document.getElementById("eval-btn").disabled=false}
+}
+
+function fillRes(r){
+  const kwr=r.matched.length/Math.max(r.keywords.length,1);
+  set("mv1",`${(r.similarity*100).toFixed(1)}%`);
+  set("mv2",`${r.matched.length}<small>/${r.keywords.length}</small>`);
+  set("mv3",`${r.score}<small>/10</small>`);
+  set("bd1",bdg(r.similarity));set("bd2",bdg(kwr));set("bd3",bdg(r.score/10,.7,.4,["Excellent","Good","Needs Work"]));
+  document.getElementById("mv1").style.color=sc(r.similarity*10);
+  document.getElementById("mv2").style.color=sc(kwr*10);
+  document.getElementById("mv3").style.color=sc(r.score);
+  set("kw-lbl",`${r.matched.length} of ${r.keywords.length} key concepts matched`);
+  setTimeout(()=>document.getElementById("kw-f").style.width=(kwr*100)+"%",100);
+  set("kw-chips",r.keywords.map(k=>`<span class="chip ${r.matched.includes(k)?"c-hit":"c-miss"}">${r.matched.includes(k)?"✓":"✗"} ${k}</span>`).join(""));
+  document.getElementById("diff-m").textContent=r.model_text;
+  document.getElementById("diff-s").innerHTML=hl(r.student_text,r.keywords,r.matched);
+  const fb=r.score>7?`<div class="al al-s">🌟 <strong>Excellent!</strong> High semantic alignment and strong keyword coverage.</div>`:r.score>4?`<div class="al al-w">👍 <strong>Good attempt.</strong> Improve keyword coverage and answer depth.</div>`:`<div class="al al-d">⚠️ <strong>Needs improvement.</strong> Study the model answer carefully.</div>`;
+  set("fb-main",fb);
+  const missing=r.keywords.filter(k=>!r.matched.includes(k));
+  let t="";
+  if(missing.length)t+=`<div class="al al-i">📌 Missing concepts: <strong>${missing.slice(0,6).join(", ")}</strong></div>`;
+  if(r.similarity<.5)t+=`<div class="al al-w">📖 Answer may be off-topic — re-read the question.</div>`;
+  else if(r.similarity<.7)t+=`<div class="al al-i">🎯 Good direction — add more specific detail.</div>`;
+  if(!missing.length&&r.similarity>=.7)t+=`<div class="al al-s">✅ No critical gaps found!</div>`;
+  set("fb-tips",t);
+  if(r.ai_feedback){document.getElementById("ai-box").style.display="block";set("ai-txt",esc(r.ai_feedback))}
+  document.getElementById("results").style.display="block";
+  setTimeout(()=>renderCharts(r),80);
+}
+
+function dlTxt(){
+  if(!lastR)return;
+  const r=lastR,missing=r.keywords.filter(k=>!r.matched.includes(k));
+  const txt=`EvalAI Evaluation Report\n${"=".repeat(38)}\nStudent  : ${lastSname}\nDate     : ${new Date().toLocaleString()}\n\nSimilarity : ${(r.similarity*100).toFixed(2)}%\nKeywords   : ${r.matched.length}/${r.keywords.length}\nScore      : ${r.score}/10\nVerdict    : ${r.score>7?"Excellent":r.score>4?"Good":"Needs Improvement"}\n\nMatched  : ${r.matched.join(", ")}\nMissing  : ${missing.join(", ")}\n${r.ai_feedback?"\nAI Feedback:\n"+r.ai_feedback:""}`;
+  dl(new Blob([txt],{type:"text/plain"}),"evalai_report.txt");
+}
+async function dlPdf(){
+  if(!lastR)return;
+  const res=await fetch("/api/pdf",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...lastR,student_name:lastSname})});
+  dl(await res.blob(),"evalai_report.pdf");
+}
+/* ══ OMR ════════════════════════════════════ */
+function msChange(){document.getElementById("ms-cust").style.display=document.getElementById("ms-pre").value==="custom"?"grid":"none"}
+function getMS(){
+  const v=document.getElementById("ms-pre").value;
+  if(v==="jee"||v==="neet")return{correct:4,wrong:-1,unanswered:0};
+  if(v==="simple")return{correct:1,wrong:0,unanswered:0};
+  return{correct:+document.getElementById("ms-c").value||4,wrong:+document.getElementById("ms-w").value||-1,unanswered:+document.getElementById("ms-b").value||0};
+}
+function buildAK(nq,opts){
+  const O=["A","B","C","D","E"].slice(0,opts);
+  const el=document.getElementById("ak-grid");el.innerHTML="";
+  for(let i=1;i<=nq;i++){
+    const d=document.createElement("div");d.className="ak-row";
+    d.innerHTML=`<span class="ak-lbl">Q${i}</span><select class="ak-sel" id="ak-${i}">${O.map(o=>`<option>${o}</option>`).join("")}<option value="?">?</option></select>`;
+    el.appendChild(d);
+  }
+}
+function parseAK(){
+  const v=document.getElementById("ak-paste").value;
+  const vals=v.split(/[,\s]+/).map(x=>x.trim().toUpperCase()).filter(Boolean);
+  const nq=+document.getElementById("omr-nq").value||30;
+  const opts=+document.getElementById("omr-opts").value||4;
+  buildAK(nq,opts);
+  vals.forEach((v,i)=>{const s=document.getElementById(`ak-${i+1}`);if(s)s.value=v});
+}
+async function scanOMR(){
+  const f=document.getElementById("f-omr").files[0];
+  if(!f){alert("Upload OMR image.");return}
+  const nq=+document.getElementById("omr-nq").value||30;
+  const opts=+document.getElementById("omr-opts").value||4;
+  buildAK(nq,opts);
+  document.getElementById("omr-scan-res").style.display="none";
+  document.getElementById("omr-grade-res").style.display="none";
+  set("omr-ld-t","Scanning OMR sheet…");show("ld-omr");
+  const fd=new FormData();fd.append("omr_image",f);fd.append("num_questions",nq);fd.append("options_per_q",opts);
+  try{
+    const res=await fetch("/api/omr-scan",{method:"POST",body:fd});
+    const data=await res.json();
+    if(data.error){alert("Scan: "+data.error);return}
+    omrDet=data.detected;
+    const O=["A","B","C","D","E"].slice(0,opts);
+    const dg=document.getElementById("det-grid");dg.innerHTML="";
+    for(let i=1;i<=nq;i++){
+      const a=omrDet[`Q${i}`]||"?";
+      const d=document.createElement("div");d.className="omr-cell";
+      d.innerHTML=`<span class="omr-q">Q${i}</span><span class="omr-a ${a==="?"?"c-bl":""}">${a}</span>`;
+      dg.appendChild(d);
+    }
+    const eg=document.getElementById("edit-grid");eg.innerHTML="";
+    for(let i=1;i<=nq;i++){
+      const a=omrDet[`Q${i}`]||"?";
+      const d=document.createElement("div");d.className="ak-row";
+      d.innerHTML=`<span class="ak-lbl">Q${i}</span><select class="ak-sel" id="ed-${i}">${O.map(o=>`<option ${o===a?"selected":""}>${o}</option>`).join("")}<option value="?" ${a==="?"?"selected":""}>?</option></select>`;
+      eg.appendChild(d);
+    }
+    document.getElementById("omr-scan-res").style.display="block";
+  }catch(e){alert("Error: "+e)}
+  finally{hide("ld-omr")}
+}
+async function gradeOMR(){
+  const nq=+document.getElementById("omr-nq").value||30;
+  const sa={},ak={};
+  for(let i=1;i<=nq;i++){
+    const e=document.getElementById(`ed-${i}`);if(e)sa[`Q${i}`]=e.value;
+    const a=document.getElementById(`ak-${i}`);if(a)ak[`Q${i}`]=a.value;
+  }
+  show("ld-omr");set("omr-ld-t","Grading…");
+  try{
+    const res=await fetch("/api/omr-grade",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({student_answers:sa,answer_key:ak,marking_scheme:getMS()})});
+    const data=await res.json();
+    omrGR=data;
+    hist.push({label:"OMR Exam",time:new Date().toLocaleTimeString(),score:+(data.percentage/10).toFixed(1),sim:"—",kw:"—"});
+    showOMRRes(data);
+  }catch(e){alert("Error: "+e)}
+  finally{hide("ld-omr")}
+}
+function showOMRRes(d){
+  const pct=d.percentage,grade=pct>=90?"A+":pct>=80?"A":pct>=70?"B":pct>=60?"C":pct>=40?"D":"F";
+  set("omr-mets",`
+    <div class="card an"><p class="card-title">Score</p><p class="mv" style="color:${sc(pct/10)}">${d.raw_score}<small>/${d.max_score}</small></p><span class="badge b-p">● ${grade}</span></div>
+    <div class="card an d1"><p class="card-title">Percentage</p><p class="mv" style="color:${sc(pct/10)}">${pct}<small>%</small></p></div>
+    <div class="card an d2"><p class="card-title">Correct</p><p class="mv" style="color:var(--grn)">${d.correct}</p></div>
+    <div class="card an d3"><p class="card-title">Wrong</p><p class="mv" style="color:var(--red)">${d.wrong}</p></div>`);
+  setTimeout(()=>pDonut(d.correct,d.wrong,d.unanswered,"omr-donut"),80);
+  set("omr-tbody",Object.entries(d.details).map(([q,v])=>{
+    const cls=v.status==="correct"?"c-ok":v.status==="wrong"?"c-wr":"c-bl";
+    return`<tr><td style="font-weight:700">${q}</td><td class="${cls}" style="font-family:'JetBrains Mono',monospace;font-weight:700">${v.student}</td><td style="font-family:'JetBrains Mono',monospace">${v.correct}</td><td><span class="badge ${v.status==="correct"?"b-g":v.status==="wrong"?"b-r":"b-o"}">${v.status==="correct"?"✓":v.status==="wrong"?"✗":"—"} ${v.status}</span></td></tr>`;
+  }).join(""));
+  document.getElementById("omr-grade-res").style.display="block";
+}
+function dlOMR(){
+  if(!omrGR)return;
+  const rows=["Q,Student,Correct,Status",...Object.entries(omrGR.details).map(([q,v])=>`${q},${v.student},${v.correct},${v.status}`)];
+  rows.push(`\nScore,${omrGR.raw_score}/${omrGR.max_score}`);
+  rows.push(`Percentage,${omrGR.percentage}%`);
+  dlCsv(rows.join("\n"),"omr_results.csv");
+}
+ 
+/* ══ MULTI-Q ════════════════════════════════ */
+async function runMulti(){
+  const mf=document.getElementById("f-mm").files[0],mt=document.getElementById("ta-mm").value.trim();
+  const sf=document.getElementById("f-ms").files[0],st=document.getElementById("ta-ms").value.trim();
+  if(!mf&&!mt){alert("Provide model answers.");return}
+  if(!sf&&!st){alert("Provide student answers.");return}
+  const fd=new FormData();
+  if(mf)fd.append("model",mf);else fd.append("model_text",mt);
+  if(sf)fd.append("student",sf);else fd.append("student_text",st);
+  addRubricToForm(fd);
+  document.getElementById("multi-res").style.display="none";show("ld-m");
+  try{
+    const res=await fetch("/api/evaluate-multi",{method:"POST",body:fd});
+    const data=await res.json();
+    if(data.error){alert(data.error);return}
+    const qns=Object.keys(data),scores=qns.map(q=>data[q].score);
+    const avg=(scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(2);
+    hist.push({label:`Multi-Q (${qns.length}Q)`,time:new Date().toLocaleTimeString(),score:parseFloat(avg),sim:"—",kw:"—"});
+    let html=`<div class="sec">📊 Summary</div>
+      <div class="g3" style="margin-bottom:20px">
+        <div class="card"><p class="card-title">Questions</p><p class="mv">${qns.length}</p></div>
+        <div class="card"><p class="card-title">Average Score</p><p class="mv" style="color:var(--acc)">${avg}<small>/10</small></p>${bdg(avg/10,.7,.4,["Excellent","Good","Needs Work"])}</div>
+        <div class="card"><p class="card-title">Best Question</p><p class="mv">${qns[scores.indexOf(Math.max(...scores))]}</p><span class="badge b-g">${Math.max(...scores)}/10</span></div>
+      </div>
+      <div class="sec">📈 Scores</div>
+      <div class="card" style="margin-bottom:20px"><div id="mq-bar" style="min-height:290px"></div></div>
+      <div class="sec">📝 Per-Question Detail</div>`;
+    qns.forEach(qn=>{
+      const r=data[qn];
+      const chips=r.keywords.map(k=>`<span class="chip ${r.matched.includes(k)?"c-hit":"c-miss"}">${r.matched.includes(k)?"✓":"✗"} ${k}</span>`).join("");
+      html+=`<details class="exp"><summary>${qn} <span style="color:${sc(r.score)};font-family:'JetBrains Mono',monospace;font-weight:800">${r.score}/10</span></summary>
+        <div class="eb"><div class="g3" style="margin-bottom:12px">
+          <div class="card"><p class="card-title">Similarity</p><p class="mv" style="font-size:1.8rem">${(r.similarity*100).toFixed(1)}%</p></div>
+          <div class="card"><p class="card-title">Keywords</p><p class="mv" style="font-size:1.8rem">${r.matched.length}<small>/${r.keywords.length}</small></p></div>
+          <div class="card"><p class="card-title">Score</p><p class="mv" style="font-size:1.8rem;color:${sc(r.score)}">${r.score}<small>/10</small></p></div>
+        </div><div class="chips">${chips}</div></div></details>`;
+    });
+    const csv=["Q,Score,Similarity%,Matched,Total",...qns.map(q=>`${q},${data[q].score},${(data[q].similarity*100).toFixed(1)},${data[q].matched.length},${data[q].keywords.length}`)].join("\n");
+    html+=`<div style="max-width:360px;margin-top:16px"><button class="btn btn-o" onclick="dlCsv(\`${csv}\`,'multi_q.csv')">📊 Download CSV</button></div>`;
+    const el=document.getElementById("multi-res");el.innerHTML=html;el.style.display="block";
+    setTimeout(()=>pBar(qns,scores,"mq-bar"),80);
+  }catch(e){alert("Error: "+e)}
+  finally{hide("ld-m")}
+}
+ 
+/* ══ BATCH ══════════════════════════════════ */
+async function runBatch(){
+  const mf=document.getElementById("f-bm").files[0],mt=document.getElementById("ta-bm").value.trim();
+  const sfs=document.getElementById("f-bs").files;
+  if(!mf&&!mt){alert("Provide model answer.");return}
+  if(!sfs.length){alert("Upload student files.");return}
+  const fd=new FormData();
+  if(mf)fd.append("model",mf);else fd.append("model_text",mt);
+  Array.from(sfs).forEach(f=>fd.append("students",f));
+  addRubricToForm(fd);
+  document.getElementById("batch-res").style.display="none";show("ld-b");
+  try{
+    const res=await fetch("/api/evaluate-batch",{method:"POST",body:fd});
+    const rows=await res.json();
+    if(rows.error){alert(rows.error);return}
+    const scores=rows.map(r=>r.score);
+    const avg=(scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(2);
+    hist.push({label:`Batch (${rows.length})`,time:new Date().toLocaleTimeString(),score:parseFloat(avg),sim:"—",kw:"—"});
+    const gc={};rows.map(r=>r.score>=8?"A":r.score>=6?"B":r.score>=4?"C":"F").forEach(g=>gc[g]=(gc[g]||0)+1);
+    const trows=rows.map((r,i)=>`<tr><td style="font-weight:700">#${i+1}</td><td style="font-weight:600">${esc(r.name)}</td><td><span class="badge ${r.score>=7?"b-g":r.score>=4?"b-o":"b-r"}">${r.score}/10</span></td><td>${r.similarity}%</td><td>${r.matched}/${r.total_kw}</td></tr>`).join("");
+    const csv=["Student,Score,Similarity%,Matched,Total",...rows.map(r=>`${r.name},${r.score},${r.similarity},${r.matched},${r.total_kw}`)].join("\n");
+    const el=document.getElementById("batch-res");
+    el.innerHTML=`
+      <div class="sec">📊 Class Summary</div>
+      <div class="g3" style="margin-bottom:20px">
+        <div class="card"><p class="card-title">Students</p><p class="mv">${rows.length}</p></div>
+        <div class="card"><p class="card-title">Average</p><p class="mv" style="color:var(--acc)">${avg}<small>/10</small></p></div>
+        <div class="card"><p class="card-title">Top Score</p><p class="mv" style="color:var(--grn)">${Math.max(...scores)}<small>/10</small></p></div>
+      </div>
+      <div class="sec">📈 Analytics</div>
+      <div class="g2" style="margin-bottom:20px">
+        <div class="card"><p class="card-title">Score Distribution</p><div id="b-hist" style="min-height:240px"></div></div>
+        <div class="card"><p class="card-title">Grade Distribution</p><div id="b-pie" style="min-height:240px"></div></div>
+      </div>
+      <div class="sec">🏆 Leaderboard</div>
+      <div class="card" style="overflow:auto;margin-bottom:16px"><table class="dtbl"><thead><tr><th>Rank</th><th>Student</th><th>Score</th><th>Similarity</th><th>Keywords</th></tr></thead><tbody>${trows}</tbody></table></div>
+      <div style="max-width:360px"><button class="btn btn-o" onclick="dlCsv(\`${csv}\`,'class_results.csv')">📊 Download CSV</button></div>`;
+    el.style.display="block";
+    setTimeout(()=>{pHist(scores,"b-hist");pPie(Object.keys(gc),Object.values(gc),"b-pie")},80);
+  }catch(e){alert("Error: "+e)}
+  finally{hide("ld-b")}
+}
+ 
+/* ══ HISTORY ════════════════════════════════ */
+function renderHist(){
+  const el=document.getElementById("hist-cnt");
+  if(!hist.length){el.innerHTML=`<div class="empty"><div class="empty-ic">📭</div><p>No evaluations yet.</p></div>`;return}
+  const avg=(hist.reduce((a,h)=>a+h.score,0)/hist.length).toFixed(2);
+  const hi=Math.max(...hist.map(h=>h.score));
+  const rows=[...hist].reverse().map(h=>`<div class="hist-row"><div><div class="hist-lbl">${esc(h.label)}</div><div class="hist-t">${h.time}</div></div><div style="text-align:right"><div class="hist-sc">${h.score}/10</div><div style="font-size:.7rem;color:var(--sub)">Sim: ${h.sim}</div></div></div>`).join("");
+  el.innerHTML=`
+    <div class="g3" style="margin-bottom:20px">
+      <div class="card"><p class="card-title">Total</p><p class="mv">${hist.length}</p></div>
+      <div class="card"><p class="card-title">Average</p><p class="mv" style="color:var(--acc)">${avg}<small>/10</small></p></div>
+      <div class="card"><p class="card-title">Best</p><p class="mv" style="color:var(--grn)">${hi}<small>/10</small></p></div>
+    </div>
+    ${hist.length>1?`<div class="sec">📈 Score Trend</div><div class="card" style="margin-bottom:20px"><div id="h-trend" style="min-height:240px"></div></div>`:""}
+    <div class="sec">📋 All Evaluations</div>
+    <div class="card" style="margin-bottom:14px">${rows}</div>
+    <div style="max-width:200px"><button class="btn btn-o" style="font-size:.82rem;padding:9px" onclick="hist=[];renderHist()">🗑 Clear History</button></div>`;
+  if(hist.length>1)setTimeout(()=>pTrend(hist,"h-trend"),80);
+}
+ 
+/* ══ INIT ═══════════════════════════════════ */
+buildAK(30,4);
+</script>
+</body>
+</html>

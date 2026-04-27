@@ -1,0 +1,9 @@
+Newton gave us three laws of motion. First law is about inertia meaning things stay still or keep moving unless force is applied. Second law says force equals mass times acceleration. Third law is action and reaction are equal and opposite.
+
+Momentum = mass x velocity. When no force is there momentum stays same. This is conservation of momentum. Used in rockets going to space.
+
+Collisions: elastic collision conserves kinetic energy and momentum. Inelastic collision loses kinetic energy but momentum is conserved. When bodies stick together it's called perfectly inelastic.
+
+Friction force opposes motion. Static friction is more than kinetic friction. Friction depends on normal reaction.
+
+For circular motion there must be centripetal force toward center equal to mv squared by r. Banking of roads helps vehicles turn without slipping.

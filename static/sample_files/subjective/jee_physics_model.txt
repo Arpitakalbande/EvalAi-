@@ -1,0 +1,44 @@
+NEWTON'S LAWS OF MOTION — COMPLETE NOTES
+
+Newton's First Law (Law of Inertia):
+A body continues to remain in its state of rest or uniform motion along a straight line unless compelled by an external net force to change that state. Inertia is the intrinsic property of matter that resists any change in its state of motion.
+
+Newton's Second Law:
+The net external force acting on a body is equal to the rate of change of its linear momentum.
+F = dp/dt = ma (when mass is constant)
+where p = mv is the linear momentum. The direction of acceleration is always the same as the net applied force.
+
+Newton's Third Law:
+Every action has an equal and opposite reaction. Forces always occur in action-reaction pairs, acting on different bodies simultaneously. They are equal in magnitude and opposite in direction.
+
+Impulse-Momentum Theorem:
+Impulse = Force x time = J = F.dt = change in momentum = m(v - u)
+Important in collisions and explosions where large forces act for very short time intervals.
+
+Law of Conservation of Linear Momentum:
+If the net external force on a system is zero, the total linear momentum of the system remains constant.
+m1u1 + m2u2 = m1v1 + m2v2 (two-body system)
+This is applicable in explosions, collisions, and rocket propulsion.
+
+Types of Collisions:
+1. Elastic Collision: Both kinetic energy and momentum are conserved. e = 1 (coefficient of restitution).
+2. Inelastic Collision: Only momentum is conserved; kinetic energy decreases. e < 1.
+3. Perfectly Inelastic: Bodies stick together after collision. Maximum loss of kinetic energy. e = 0.
+
+Friction:
+Static friction: fs <= us x N; prevents relative motion between surfaces.
+Kinetic friction: fk = uk x N; opposes relative sliding motion.
+Always us > uk. Friction is independent of contact area. Depends only on nature of surfaces and normal reaction.
+
+Laws of Friction: Friction is proportional to normal force, independent of area, depends on nature of surfaces.
+
+Circular Motion and Centripetal Force:
+Centripetal acceleration: a = v^2/r = omega^2 x r (directed toward center)
+Centripetal force: F = mv^2/r (must be provided by a real force — tension, friction, normal force, gravity)
+Banking angle: tan(theta) = v^2/rg for frictionless banked road.
+
+Applications:
+- Rocket propulsion uses Newton's Third Law (gas expelled back, rocket goes forward)
+- Walking: push ground backward, ground pushes you forward
+- Recoil of gun: momentum conserved; bullet goes forward, gun recoils backward
+- Banking of roads: resolves need for friction in curved paths
